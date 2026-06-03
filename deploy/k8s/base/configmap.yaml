@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+data:
+  # 라우트 대상은 k8s Service DNS. (Spring relaxed binding: ROUTES_AUTH -> routes.auth)
+  ROUTES_AUTH: "http://auth-service:8080"
+  ROUTES_MEMBER: "http://member-service:8080"
+  ROUTES_PRODUCT: "http://product-service:8080"
