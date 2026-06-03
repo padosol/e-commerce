@@ -12,4 +12,5 @@ resources:
   - member-service.yaml
   - product-service.yaml
   - cart-service.yaml
+  - inventory-service.yaml
   - ingress.yaml
