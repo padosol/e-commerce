@@ -27,7 +27,7 @@
 - [x] `api-gateway`: Resource Server로 JWT 검증, `/api/auth/**`·actuator 공개·그 외 인증 요구
 - [x] 테스트: 도메인 단위(Kotest) · 서비스 mock(MockK) · 컨트롤러 REST Docs(standalone MockMvc) · ArchUnit 경계 · 경량 계약(이벤트 스키마 round-trip + JWT/JWKS) — auth 14 + member 15 통과
 - [x] Testcontainers 통합 테스트 **통과**(실 Postgres+Kafka): auth `SignUpIntegrationTest`(signup→자격증명 영속화), member `UserRegisteredConsumerIntegrationTest`(UserRegistered 이벤트→회원 프로필 자동 생성). `./gradlew :services:<svc>:integrationTest`.
-- [ ] (남음) 풀스택 런타임 E2E(앱 다중 구동 + signup→login→/me 200/무효토큰 401) — 다중 서버 포트 바인딩 필요, 로컬.
+- [x] **풀스택 런타임 E2E 통과**(`infra/docker-compose.full.yml`, 9개 서비스+Kafka+Postgres+Redis 컨테이너): signup→login→`/me` 200 / 무토큰 401, 게이트웨이(:18080) 경유 실서비스 간 검증.
 
 > 테스트 정책: 신규 기능은 **Phase 2부터 TDD**(실패 테스트 → 구현 → 리팩터). 레이어별 — domain=순수 단위, application/service=포트 mock, controller=REST Docs, 서비스 간=경량 계약, 경계=ArchUnit.
 
@@ -61,6 +61,7 @@
 **Verify**:
 - [x] 보상 로직(단위): 결제 실패 → 재고 예약 해제 → 주문 `CANCELLED`, 재고 부족 → 결제/배송 미진행 — CheckoutServiceTest mock 포트로 green.
 - [x] **통합 테스트 통과**(실 Postgres+Kafka, Testcontainers): 정상 플로우→`CONFIRMED`+Outbox `OrderConfirmed`, 결제 실패→재고 해제→`CANCELLED`+Outbox `OrderCancelled` — `OrderSagaIntegrationTest`(다운스트림 스텁). 실 DB가 단방향 @OneToMany FK 누락 버그도 검출·수정.
+- [x] **실 서비스 간 E2E 통과**(docker-compose.full, 스텁 아님): 체크아웃→재고예약→결제→재고확정→배송→`CONFIRMED`(재고 available 98/reserved 0로 확인). payment 콜드스타트 지연 시 타임아웃→Resilience4j fallback→보상→`CANCELLED` 라이브 시연.
 
 ---
 

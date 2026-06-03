@@ -1,6 +1,7 @@
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.Test
 
 plugins {
@@ -19,6 +20,9 @@ configure<DependencyManagementExtension> {
         mavenBom(libs.spring.cloud.dependencies.get().toString())
     }
 }
+
+// 실행 가능한 bootJar 만 생성(plain jar 비활성화) — 이미지 빌드 시 단일 jar 보장
+tasks.named<Jar>("jar") { enabled = false }
 
 dependencies {
     "implementation"(libs.jackson.module.kotlin)

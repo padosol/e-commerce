@@ -1,0 +1,155 @@
+name: ecommerce-full
+
+# 전체 스택 E2E 실행용 — 9개 서비스 + Postgres/Kafka/Redis.
+# 사전: 각 서비스 이미지 빌드(ecommerce/<svc>:latest). 게이트웨이만 8080으로 진입, 나머지는 디버깅/시드용 노출.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ecommerce
+      POSTGRES_PASSWORD: ecommerce
+      POSTGRES_DB: ecommerce
+    volumes:
+      - ./postgres/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecommerce"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  kafka:
+    image: apache/kafka:3.8.1
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  auth-service:
+    image: ecommerce/auth-service:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/auth
+      SPRING_DATASOURCE_USERNAME: ecommerce
+      SPRING_DATASOURCE_PASSWORD: ecommerce
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports: ["8081:8081"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+
+  member-service:
+    image: ecommerce/member-service:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/member
+      SPRING_DATASOURCE_USERNAME: ecommerce
+      SPRING_DATASOURCE_PASSWORD: ecommerce
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JWK_SET_URI: http://auth-service:8081/oauth2/jwks
+    ports: ["8082:8082"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+
+  product-service:
+    image: ecommerce/product-service:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/product
+      SPRING_DATASOURCE_USERNAME: ecommerce
+      SPRING_DATASOURCE_PASSWORD: ecommerce
+    ports: ["8083:8083"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  cart-service:
+    image: ecommerce/cart-service:latest
+    environment:
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: "6379"
+      JWK_SET_URI: http://auth-service:8081/oauth2/jwks
+      PRODUCT_SERVICE_BASE_URL: http://product-service:8083
+    ports: ["8084:8084"]
+    depends_on:
+      redis: { condition: service_healthy }
+
+  inventory-service:
+    image: ecommerce/inventory-service:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inventory
+      SPRING_DATASOURCE_USERNAME: ecommerce
+      SPRING_DATASOURCE_PASSWORD: ecommerce
+    ports: ["8085:8085"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  payment-service:
+    image: ecommerce/payment-service:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment
+      SPRING_DATASOURCE_USERNAME: ecommerce
+      SPRING_DATASOURCE_PASSWORD: ecommerce
+    ports: ["8086:8086"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  shipping-service:
+    image: ecommerce/shipping-service:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shipping
+      SPRING_DATASOURCE_USERNAME: ecommerce
+      SPRING_DATASOURCE_PASSWORD: ecommerce
+    ports: ["8087:8087"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  order-service:
+    image: ecommerce/order-service:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/order
+      SPRING_DATASOURCE_USERNAME: ecommerce
+      SPRING_DATASOURCE_PASSWORD: ecommerce
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JWK_SET_URI: http://auth-service:8081/oauth2/jwks
+      INVENTORY_SERVICE_BASE_URL: http://inventory-service:8085
+      PAYMENT_SERVICE_BASE_URL: http://payment-service:8086
+      SHIPPING_SERVICE_BASE_URL: http://shipping-service:8087
+    ports: ["8088:8088"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+
+  api-gateway:
+    image: ecommerce/api-gateway:latest
+    environment:
+      JWK_SET_URI: http://auth-service:8081/oauth2/jwks
+      ROUTES_AUTH: http://auth-service:8081
+      ROUTES_MEMBER: http://member-service:8082
+      ROUTES_PRODUCT: http://product-service:8083
+      ROUTES_CART: http://cart-service:8084
+      ROUTES_ORDER: http://order-service:8088
+    ports: ["18080:8080"]
+    depends_on:
+      - auth-service
+      - member-service
+      - product-service
+      - cart-service
+      - order-service
