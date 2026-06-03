@@ -22,6 +22,9 @@ configure<DependencyManagementExtension> {
 
 dependencies {
     "implementation"(libs.jackson.module.kotlin)
+    // 분산추적(전 서비스 공통): Micrometer Tracing + OpenTelemetry → Zipkin
+    "implementation"("io.micrometer:micrometer-tracing-bridge-otel")
+    "implementation"("io.opentelemetry:opentelemetry-exporter-zipkin")
 }
 
 // Testcontainers 기반 통합 테스트는 별도 태스크로 분리 (실 DB/Kafka 필요)

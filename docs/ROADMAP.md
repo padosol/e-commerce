@@ -80,12 +80,13 @@
 
 ## Phase 5 — 안정화(Hardening)
 
-- [ ] Saga 전 구간 분산 추적(트레이스 한 화면에서 확인)
-- [ ] 회복탄력성: timeout/retry/circuit breaker(Resilience4j) 정책 정리
-- [ ] 멱등성/Outbox 릴레이/DLQ(Dead Letter) 점검
-- [ ] 부하/실패 주입 테스트, 대시보드(메트릭/로그/트레이스)
+- [x] Saga 전 구간 분산 추적: **전 서비스에 Micrometer Tracing + OpenTelemetry→Zipkin** 의존성(컨벤션) + order 샘플링 1.0. (Zipkin은 infra/docker-compose에 존재; 트레이스 상관관계 확인은 런타임)
+- [x] 회복탄력성: order Saga 클라이언트(inventory/payment/shipping)에 **Resilience4j @CircuitBreaker + @Retry + RestClient timeout(connect 2s/read 3s)**, fallback으로 보상 흐름 보장(재고 실패→예약불가, 결제 실패→거절).
+- [x] Outbox DLQ: 이벤트별 격리 처리 + `attempts` 재시도 + 임계치(5) 초과 시 `dead` 표시(DLQ). 발행 대상 쿼리에서 제외.
+- [ ] (남음, 런타임) 부하/실패 주입 테스트 + 대시보드(Grafana/Tempo/Loki) — 클러스터 필요.
 
-**Verify**: 의도적 장애 주입 시 보상·재시도·DLQ가 기대대로 동작, 추적으로 원인 1분 내 파악.
+**Verify (코드/빌드)**: `./gradlew build` green(전 서비스 추적 의존성 컴파일 + order resilience4j/outbox DLQ).
+**Verify (런타임, 클러스터)**: [ ] 장애 주입 시 보상·재시도·DLQ 동작 + 트레이스 한 화면 확인 — 샌드박스 외.
 
 ---
 

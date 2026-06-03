@@ -10,6 +10,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation(libs.resilience4j.spring.boot3)
     implementation("org.flywaydb:flyway-core")
 
     runtimeOnly("org.postgresql:postgresql")

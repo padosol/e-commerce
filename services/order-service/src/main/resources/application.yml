@@ -33,11 +33,45 @@ services:
   shipping:
     base-url: ${SHIPPING_SERVICE_BASE_URL:http://localhost:8087}
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventory:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        ignore-exceptions:
+          - com.padosol.order.application.port.out.InventoryReservationException
+      payment:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      shipping:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+  retry:
+    instances:
+      inventory:
+        max-attempts: 3
+        wait-duration: 200ms
+        ignore-exceptions:
+          - com.padosol.order.application.port.out.InventoryReservationException
+      payment:
+        max-attempts: 3
+        wait-duration: 200ms
+      shipping:
+        max-attempts: 3
+        wait-duration: 200ms
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+  tracing:
+    sampling:
+      probability: 1.0
   endpoint:
     health:
       probes:
