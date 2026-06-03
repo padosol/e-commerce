@@ -121,5 +121,6 @@ kubectl apply -k deploy/k8s/base                   # ns + 서비스 + ConfigMap/
 
 ## 문서
 
+- [`docs/RUN.md`](docs/RUN.md) — **실행 가이드**(시나리오별 명령어 순서: 로컬 개발 / 전체 스택 / E2E / 프론트 / k8s)
 - [`docs/PLAN.md`](docs/PLAN.md) — 서비스 분해, 헥사고날/DDD 구조, 통신/Saga, 인증, k8s 배포 토폴로지
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — Phase 0~5 단계별 작업과 검증 기준(체크리스트)
