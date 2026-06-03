@@ -66,12 +66,15 @@
 
 ## Phase 4 — 프론트엔드 (Next.js FSD)
 
-- [ ] FSD 스캐폴딩: `src/{app,pages,widgets,features,entities,shared}`, steiger/eslint 경계
-- [ ] `shared/api`: 백엔드 OpenAPI → 타입/훅 코드 생성, TanStack Query
-- [ ] 인증: access(메모리) + refresh(httpOnly 쿠키) + Next Route Handler BFF
-- [ ] 화면: 로그인 → 상품목록/상세 → 장바구니 → 체크아웃
+- [x] FSD 스캐폴딩: `src/{app,views,widgets,features,entities,shared}` — **Next 충돌로 `pages`→`views` 리네임**. steiger ✓ 통과, eslint ✓ 무결.
+- [x] `shared/api`: 타입드 fetch 클라이언트(+ 토큰 주입). (OpenAPI 코드젠/TanStack Query는 후속 고도화)
+- [x] 인증: access(메모리 `shared/auth`) + refresh(httpOnly 쿠키) + Next Route Handler BFF(`app/api/auth/*`)
+- [x] 화면: 로그인 → 상품목록(담기) → 장바구니 → 체크아웃(주문)
+- [x] `next build` green (Next 15.5.19 — critical CVE 패치 반영)
 
-**Verify**: Playwright E2E — 로그인 → 상품 탐색 → 담기 → 주문 완료 시나리오 통과.
+**Verify**:
+- [x] 빌드/경계: `npm run build` ✓, `npm run lint` ✓, `npm run fsd`(steiger) ✓.
+- [ ] (남음) Playwright E2E 실행 — 백엔드 스택 구동 + 브라우저 필요(샌드박스 외). 스펙은 `tests/e2e/checkout.spec.ts`에 작성됨.
 
 ---
 
