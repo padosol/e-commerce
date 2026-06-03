@@ -86,8 +86,10 @@
 - [x] Outbox DLQ: 이벤트별 격리 처리 + `attempts` 재시도 + 임계치(5) 초과 시 `dead` 표시(DLQ). 발행 대상 쿼리에서 제외.
 - [ ] (남음, 런타임) 부하/실패 주입 테스트 + 대시보드(Grafana/Tempo/Loki) — 클러스터 필요.
 
-**Verify (코드/빌드)**: `./gradlew build` green(전 서비스 추적 의존성 컴파일 + order resilience4j/outbox DLQ).
-**Verify (런타임, 클러스터)**: [ ] 장애 주입 시 보상·재시도·DLQ 동작 + 트레이스 한 화면 확인 — 샌드박스 외.
+**Verify (코드/빌드/테스트)**: `./gradlew build` green(추적 의존성 + resilience4j). 
+- [x] **DLQ 의도적 장애 주입**: `OutboxRelayTest` — 발행 실패 반복 주입 → `attempts` 누적 → 임계치(5)에서 `dead`(DLQ). green.
+- [x] **보상**: Saga 결제 실패→재고 해제→`CANCELLED`(통합 `OrderSagaIntegrationTest` + 라이브 docker-compose 둘 다).
+**Verify (런타임, 클러스터)**: [ ] 부하 테스트 + 트레이스 한 화면(Grafana/Tempo) — 클러스터 필요(샌드박스 외).
 
 ---
 
