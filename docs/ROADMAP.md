@@ -75,7 +75,7 @@
 
 **Verify**:
 - [x] 빌드/경계: `npm run build` ✓, `npm run lint` ✓, `npm run fsd`(steiger) ✓.
-- [ ] (남음) Playwright E2E 실행 — 백엔드 스택 구동 + 브라우저 필요(샌드박스 외). 스펙은 `tests/e2e/checkout.spec.ts`에 작성됨.
+- [x] **Playwright E2E 통과**: 헤드리스 Chromium으로 "로그인→상품→장바구니 담기→주문" 전체 UI 플로우를 라이브 풀스택(docker-compose) 대상으로 통과(`tests/e2e/checkout.spec.ts`, 1 passed). 게이트웨이 CORS 추가로 브라우저→게이트웨이 직접 호출 허용.
 
 ---
 

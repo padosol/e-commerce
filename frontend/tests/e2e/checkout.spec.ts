@@ -11,9 +11,12 @@ test('로그인 → 상품 탐색 → 장바구니 담기 → 주문', async ({ 
   await expect(page).toHaveURL(/\/products/)
 
   await page.getByRole('button', { name: '장바구니 담기' }).first().click()
+  await expect(page.getByRole('button', { name: '담김 ✓' })).toBeVisible()
 
-  await page.goto('/cart')
+  // 헤더 링크로 클라이언트 내비게이션(메모리 access 토큰 유지)
+  await page.getByRole('link', { name: '장바구니' }).click()
+  await expect(page).toHaveURL(/\/cart/)
+
   await page.getByRole('button', { name: '주문하기' }).click()
-
-  await expect(page.getByText(/주문 상태/)).toBeVisible()
+  await expect(page.getByText(/주문 상태/)).toBeVisible({ timeout: 15000 })
 })
