@@ -32,6 +32,9 @@ dependencies {
     "testImplementation"(libs.mockk)
 }
 
-tasks.withType<Test>().configureEach {
-    useJUnitPlatform()
+tasks.named<Test>("test") {
+    useJUnitPlatform {
+        // 통합 테스트(@Tag("integration"))는 기본 빌드에서 제외 — 실 인프라가 필요하므로 integrationTest 태스크로 실행
+        excludeTags("integration")
+    }
 }

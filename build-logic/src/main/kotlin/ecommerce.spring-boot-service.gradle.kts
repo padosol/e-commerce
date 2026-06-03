@@ -1,5 +1,7 @@
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import org.gradle.accessors.dm.LibrariesForLibs
+import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.tasks.testing.Test
 
 plugins {
     id("ecommerce.kotlin-common")
@@ -20,4 +22,15 @@ configure<DependencyManagementExtension> {
 
 dependencies {
     "implementation"(libs.jackson.module.kotlin)
+}
+
+// Testcontainers 기반 통합 테스트는 별도 태스크로 분리 (실 DB/Kafka 필요)
+tasks.register<Test>("integrationTest") {
+    description = "Testcontainers 기반 통합 테스트 (@Tag(\"integration\"))"
+    group = "verification"
+    val testSourceSet = the<SourceSetContainer>()["test"]
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+    useJUnitPlatform { includeTags("integration") }
+    shouldRunAfter("test")
 }
