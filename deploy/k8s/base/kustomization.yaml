@@ -13,4 +13,5 @@ resources:
   - product-service.yaml
   - cart-service.yaml
   - inventory-service.yaml
+  - payment-service.yaml
   - ingress.yaml
