@@ -5,6 +5,9 @@ namespace: ecommerce
 
 resources:
   - namespace.yaml
+  - secret.yaml
   - configmap.yaml
   - api-gateway.yaml
+  - auth-service.yaml
+  - member-service.yaml
   - ingress.yaml

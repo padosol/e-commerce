@@ -6,6 +6,7 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     kotlin("plugin.spring")
+    kotlin("plugin.jpa") // @Entity 등에 no-arg 생성자 생성 (Hibernate 인스턴스화)
 }
 
 val libs = the<LibrariesForLibs>()

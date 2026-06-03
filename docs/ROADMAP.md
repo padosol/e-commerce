@@ -22,11 +22,18 @@
 
 ## Phase 1 — 회원·인증
 
-- [ ] `auth-service`: Spring Authorization Server, 회원가입/로그인, JWT(access/refresh) 발급, `UserRegistered` 이벤트 발행
-- [ ] `member-service`: `UserRegistered` 소비 → 프로필 생성, 주소 관리
-- [ ] `api-gateway`: Resource Server로 JWT 검증, 보호 라우트 구성
+- [x] `auth-service`: 회원가입/로그인, JWT(access/refresh) 발급, JWKS 공개, `UserRegistered` 이벤트 발행
+- [x] `member-service`: `UserRegistered` 소비(멱등) → 프로필 생성, `/me`·주소 추가, Resource Server JWT 검증
+- [x] `api-gateway`: Resource Server로 JWT 검증, `/api/auth/**`·actuator 공개·그 외 인증 요구
+- [ ] (남음) Testcontainers 통합/계약 테스트 + 로컬 런타임 검증
 
-**Verify**: 회원가입 → 로그인 → JWT 발급 → 보호 API 호출 성공/실패(토큰 무효 시 401). member 프로필이 이벤트로 자동 생성. auth↔member 계약 테스트 통과.
+**구현 메모**:
+- 인증 토큰은 Spring Security `JwtEncoder`(NimbusJwtEncoder, RS256, 인메모리 RSA 키) + `/oauth2/jwks` 공개 방식으로 발급. OIDC 표준 플로우(authorization_code 등)가 필요해지면 Spring Authorization Server로 승격.
+- 검증은 `jwk-set-uri` 기반(게이트웨이·member). JWT `sub`=userId(UUID)로 서비스 간 일관.
+- 컨벤션 플러그인에 `kotlin("plugin.jpa")`(no-arg) 추가 — Hibernate 엔티티 인스턴스화용.
+
+**Verify (코드/빌드)**: `./gradlew build` ✅, `kubectl kustomize deploy/k8s/base` ✅(gateway·auth·member 렌더). 
+**Verify (런타임, 로컬에서)**: 회원가입 → 로그인 → JWT 발급 → `/api/members/me` 200, 무효 토큰 401, 이벤트로 member 프로필 자동 생성. (이 하니스 샌드박스는 네트워크 바인딩 차단으로 런타임 미검증)
 
 ---
 
