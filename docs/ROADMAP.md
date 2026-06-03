@@ -55,7 +55,7 @@
 - [ ] `order-service`: Order 애그리거트 + 상태머신 + **체크아웃 Saga 오케스트레이터**
 - [x] `payment-service`: 결제 승인(멱등 키로 중복 방지)/취소, Mock PG 어댑터(PaymentGateway 포트), 상태머신(PENDING→APPROVED/FAILED→CANCELLED). TDD 13개 green. 내부 서비스.
 - [x] `inventory-service`: 재고 예약/확정/해제, 낙관적 락(`@Version`) 동시성 제어, REST(reserve/confirm/release). TDD 13개 green (StockTest, InventoryService mock, InventoryController REST Docs, ArchUnit). 내부 서비스(게이트웨이 비노출).
-- [ ] `shipping-service`: 배송 생성/추적
+- [x] `shipping-service`: 배송 생성/출고(운송장)/배송완료/추적, 상태머신(CREATED→IN_TRANSIT→DELIVERED), 주소 스냅샷. TDD 13개 green. 내부 서비스.
 - [ ] **Transactional Outbox** + 멱등 consumer 전 서비스 적용
 
 **Verify**:
