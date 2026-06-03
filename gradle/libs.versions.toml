@@ -5,6 +5,7 @@ springCloud = "2024.0.1"
 springDependencyManagement = "1.1.7"
 kotest = "5.9.1"
 mockk = "1.13.16"
+archunit = "1.3.0"
 
 [libraries]
 # --- Gradle plugin artifacts (build-logic classpath) ---
@@ -25,3 +26,4 @@ jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }

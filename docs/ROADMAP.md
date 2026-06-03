@@ -25,7 +25,10 @@
 - [x] `auth-service`: 회원가입/로그인, JWT(access/refresh) 발급, JWKS 공개, `UserRegistered` 이벤트 발행
 - [x] `member-service`: `UserRegistered` 소비(멱등) → 프로필 생성, `/me`·주소 추가, Resource Server JWT 검증
 - [x] `api-gateway`: Resource Server로 JWT 검증, `/api/auth/**`·actuator 공개·그 외 인증 요구
-- [ ] (남음) Testcontainers 통합/계약 테스트 + 로컬 런타임 검증
+- [x] 테스트: 도메인 단위(Kotest) · 서비스 mock(MockK) · 컨트롤러 REST Docs(standalone MockMvc) · ArchUnit 경계 · 경량 계약(이벤트 스키마 round-trip + JWT/JWKS) — auth 14 + member 15 통과
+- [ ] (남음) Testcontainers 통합 테스트(실 DB/Kafka) + 로컬 런타임 E2E 검증
+
+> 테스트 정책: 신규 기능은 **Phase 2부터 TDD**(실패 테스트 → 구현 → 리팩터). 레이어별 — domain=순수 단위, application/service=포트 mock, controller=REST Docs, 서비스 간=경량 계약, 경계=ArchUnit.
 
 **구현 메모**:
 - 인증 토큰은 Spring Security `JwtEncoder`(NimbusJwtEncoder, RS256, 인메모리 RSA 키) + `/oauth2/jwks` 공개 방식으로 발급. OIDC 표준 플로우(authorization_code 등)가 필요해지면 Spring Authorization Server로 승격.
