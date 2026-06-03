@@ -39,7 +39,8 @@ class OrderController(
             .body(placeOrderUseCase.place(request.toCommand(UUID.fromString(jwt.subject))))
 
     @GetMapping("/{id}")
-    fun get(@PathVariable id: UUID): OrderView = getOrderUseCase.get(id)
+    fun get(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: UUID): OrderView =
+        getOrderUseCase.get(id, UUID.fromString(jwt.subject))
 }
 
 data class PlaceOrderRequest(

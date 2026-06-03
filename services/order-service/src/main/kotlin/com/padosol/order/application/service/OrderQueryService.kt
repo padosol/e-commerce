@@ -14,6 +14,10 @@ class OrderQueryService(
     private val orderRepository: OrderRepository,
 ) : GetOrderUseCase {
 
-    override fun get(orderId: UUID): OrderView =
-        (orderRepository.findById(orderId) ?: throw OrderNotFoundException(orderId)).toView()
+    override fun get(orderId: UUID, requesterId: UUID): OrderView {
+        val order = orderRepository.findById(orderId) ?: throw OrderNotFoundException(orderId)
+        // 소유권 강제(IDOR 방지). 타인 주문은 존재를 노출하지 않도록 NotFound 처리.
+        if (order.userId != requesterId) throw OrderNotFoundException(orderId)
+        return order.toView()
+    }
 }

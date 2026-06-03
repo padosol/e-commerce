@@ -104,7 +104,7 @@ class OrderControllerDocsTest {
 
     @Test
     fun `주문 조회 API 문서화`() {
-        every { getOrderUseCase.get(orderId) } returns confirmedView()
+        every { getOrderUseCase.get(orderId, userId) } returns confirmedView()
 
         mockMvc.perform(get("/api/orders/{id}", orderId))
             .andExpect(status().isOk)

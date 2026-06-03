@@ -9,7 +9,8 @@ interface PlaceOrderUseCase {
 }
 
 interface GetOrderUseCase {
-    fun get(orderId: UUID): OrderView
+    /** 본인 주문만 조회 가능. 소유자가 아니면 존재를 노출하지 않기 위해 NotFound 로 처리한다. */
+    fun get(orderId: UUID, requesterId: UUID): OrderView
 }
 
 data class PlaceOrderCommand(
