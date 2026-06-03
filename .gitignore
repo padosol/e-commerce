@@ -1,0 +1,24 @@
+# --- Kotlin / Gradle / Spring Boot ---
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+*.class
+*.log
+out/
+bin/
+
+# --- IDE ---
+.idea/
+*.iml
+.vscode/
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+dist/
+.env*.local
+
+# --- OS ---
+.DS_Store
+Thumbs.db
