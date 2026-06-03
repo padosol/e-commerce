@@ -10,4 +10,5 @@ resources:
   - api-gateway.yaml
   - auth-service.yaml
   - member-service.yaml
+  - product-service.yaml
   - ingress.yaml
