@@ -17,6 +17,7 @@ include(
     ":services:inventory-service",
     ":services:payment-service",
     ":services:shipping-service",
+    ":services:order-service",
     ":libs:common-web",
     ":libs:common-security",
     ":libs:common-event",

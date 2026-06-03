@@ -23,10 +23,12 @@ class GatewayRouteConfig {
         @Value("\${routes.member:http://member-service:8080}") memberUri: String,
         @Value("\${routes.product:http://product-service:8080}") productUri: String,
         @Value("\${routes.cart:http://cart-service:8080}") cartUri: String,
+        @Value("\${routes.order:http://order-service:8080}") orderUri: String,
     ): RouteLocator = builder.routes()
         .route("auth-service") { r -> r.path("/api/auth/**").uri(authUri) }
         .route("member-service") { r -> r.path("/api/members/**").uri(memberUri) }
         .route("product-service") { r -> r.path("/api/products/**").uri(productUri) }
         .route("cart-service") { r -> r.path("/api/carts/**").uri(cartUri) }
+        .route("order-service") { r -> r.path("/api/orders/**").uri(orderUri) }
         .build()
 }

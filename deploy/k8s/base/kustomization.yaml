@@ -15,4 +15,5 @@ resources:
   - inventory-service.yaml
   - payment-service.yaml
   - shipping-service.yaml
+  - order-service.yaml
   - ingress.yaml

@@ -52,16 +52,15 @@
 
 ## Phase 3 — 주문·결제·재고·배송 (Saga)
 
-- [ ] `order-service`: Order 애그리거트 + 상태머신 + **체크아웃 Saga 오케스트레이터**
+- [x] `order-service`: Order 애그리거트/상태머신(PENDING→CONFIRMED/CANCELLED) + **체크아웃 Saga 오케스트레이터**(재고예약→결제→재고확정→배송), 보상(결제 실패→재고 해제→CANCELLED). 아웃바운드 RestClient(inventory/payment/shipping). TDD 13개 green — **Saga 정상/보상 경로를 mock 포트로 검증**.
 - [x] `payment-service`: 결제 승인(멱등 키로 중복 방지)/취소, Mock PG 어댑터(PaymentGateway 포트), 상태머신(PENDING→APPROVED/FAILED→CANCELLED). TDD 13개 green. 내부 서비스.
 - [x] `inventory-service`: 재고 예약/확정/해제, 낙관적 락(`@Version`) 동시성 제어, REST(reserve/confirm/release). TDD 13개 green (StockTest, InventoryService mock, InventoryController REST Docs, ArchUnit). 내부 서비스(게이트웨이 비노출).
 - [x] `shipping-service`: 배송 생성/출고(운송장)/배송완료/추적, 상태머신(CREATED→IN_TRANSIT→DELIVERED), 주소 스냅샷. TDD 13개 green. 내부 서비스.
-- [ ] **Transactional Outbox** + 멱등 consumer 전 서비스 적용
+- [~] **Transactional Outbox**: order-service에 적용(outbox_event 테이블 + OutboxRelay → Kafka `order.events`). 멱등 consumer는 후속(소비자 등장 시).
 
 **Verify**:
-- 정상: 주문 → 재고예약 → 결제 → 재고확정 → 배송생성 → `CONFIRMED`
-- 보상: 결제 실패 → 재고 예약 해제 → 주문 `CANCELLED`
-- Testcontainers(Postgres+Kafka)로 happy path + 보상 경로 통합 테스트 통과.
+- [x] 보상 로직(단위): 결제 실패 → 재고 예약 해제 → 주문 `CANCELLED`, 재고 부족 → 결제/배송 미진행 — CheckoutServiceTest mock 포트로 green.
+- [ ] (남음) Testcontainers(Postgres+Kafka) + 다운스트림 스텁으로 정상/보상 **통합** 테스트 — 실 Kafka/서비스 필요(샌드박스 외).
 
 ---
 

@@ -8,5 +8,6 @@ data:
   ROUTES_MEMBER: "http://member-service:8080"
   ROUTES_PRODUCT: "http://product-service:8080"
   ROUTES_CART: "http://cart-service:8080"
+  ROUTES_ORDER: "http://order-service:8080"
   # 게이트웨이 JWT 검증용 JWKS (auth-service Service DNS)
   JWK_SET_URI: "http://auth-service:8080/oauth2/jwks"

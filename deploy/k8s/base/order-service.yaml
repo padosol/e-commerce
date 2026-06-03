@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-config
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/order"
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  JWK_SET_URI: "http://auth-service:8080/oauth2/jwks"
+  INVENTORY_SERVICE_BASE_URL: "http://inventory-service:8080"
+  PAYMENT_SERVICE_BASE_URL: "http://payment-service:8080"
+  SHIPPING_SERVICE_BASE_URL: "http://shipping-service:8080"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  labels:
+    app: order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: ecommerce/order-service:latest
+          ports:
+            - containerPort: 8088
+          envFrom:
+            - configMapRef:
+                name: order-service-config
+            - secretRef:
+                name: db-credentials
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8088
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8088
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 384Mi
+            limits:
+              memory: 768Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  selector:
+    app: order-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8088
