@@ -28,12 +28,16 @@ dependencies {
 }
 
 // Testcontainers 기반 통합 테스트는 별도 태스크로 분리 (실 DB/Kafka 필요)
+val integrationTestSourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("test")
 tasks.register<Test>("integrationTest") {
     description = "Testcontainers 기반 통합 테스트 (@Tag(\"integration\"))"
     group = "verification"
-    val testSourceSet = the<SourceSetContainer>()["test"]
-    testClassesDirs = testSourceSet.output.classesDirs
-    classpath = testSourceSet.runtimeClasspath
+    testClassesDirs = integrationTestSourceSet.output.classesDirs
+    classpath = integrationTestSourceSet.runtimeClasspath
     useJUnitPlatform { includeTags("integration") }
     shouldRunAfter("test")
+    // 모던 Docker 데몬(API >= 1.40) 대응 — docker-java 기본(1.32) 회피. 워커 JVM 에 직접 주입.
+    val dockerApiVersion = System.getenv("DOCKER_API_VERSION") ?: "1.43"
+    environment("DOCKER_API_VERSION", dockerApiVersion)
+    systemProperty("api.version", dockerApiVersion)
 }
