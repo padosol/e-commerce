@@ -11,4 +11,5 @@ resources:
   - auth-service.yaml
   - member-service.yaml
   - product-service.yaml
+  - cart-service.yaml
   - ingress.yaml

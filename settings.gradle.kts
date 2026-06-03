@@ -13,6 +13,7 @@ include(
     ":services:auth-service",
     ":services:member-service",
     ":services:product-service",
+    ":services:cart-service",
     ":libs:common-web",
     ":libs:common-security",
     ":libs:common-event",

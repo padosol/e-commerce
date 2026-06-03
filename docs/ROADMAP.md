@@ -44,7 +44,7 @@
 ## Phase 2 — 상품·장바구니
 
 - [x] `product-service`: 상품 등록/단건·목록 조회 API, Money VO, 카테고리 필드, JPA+Flyway. TDD(red→green), 단위/서비스/REST Docs/ArchUnit 13개 green. (옵션/카테고리 애그리거트는 후속)
-- [ ] `cart-service`: 사용자별 장바구니(Redis), 담기/수정/삭제, 상품 유효성은 product 조회(Resilience4j)
+- [x] `cart-service`: 사용자별 장바구니(Redis), 담기/수정/삭제/조회, product 유효성 조회(RestClient + Resilience4j 서킷브레이커, 장애 시 낙관적 fallback), RS JWT 검증. TDD 14개 green. (Redis 통합 테스트는 후속)
 
 **Verify**: 상품 등록·조회, 장바구니 담기/조회가 사용자별로 격리. product 장애 시 cart가 graceful 동작(서킷브레이커).
 
